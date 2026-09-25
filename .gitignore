@@ -1,0 +1,7 @@
+*.rpm
+*.src.rpm
+noarch/
+build/
+*.tar.gz
+*.swp
+*~
