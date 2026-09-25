@@ -1,0 +1,20 @@
+{
+  "version": "0.1.0",
+  "author": "Sam Jage <sam@samjage.com> (https://github.com/samjage)",
+  "requires": { "cockpit": "286" },
+  "tools": {
+    "index": {
+      "label": "OpenShift Cluster",
+      "order": 10,
+      "path": "index.html",
+      "keywords": [
+        {
+          "matches": [
+            "openshift", "cluster", "health", "nodes", "operators",
+            "alerts", "csr", "storage", "lightspeed", "tailscale"
+          ]
+        }
+      ]
+    }
+  }
+}

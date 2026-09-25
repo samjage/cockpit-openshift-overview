@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OpenShift Cluster</title>
+  <script src="../base1/cockpit.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>OpenShift Cluster Overview</h1>
+  <div class="subtitle" id="cluster-name">Loading...</div>
+
+  <div class="toolbar">
+    <button id="refresh-btn">Refresh</button>
+    <a class="button secondary" id="console-link" href="#" target="_blank" rel="noopener">Open Console</a>
+    <div class="toolbar-spacer"></div>
+    <div class="menu-container">
+      <button id="panel-menu-btn" class="icon-btn" title="Choose panels" aria-label="Choose panels">&#x22EE;</button>
+      <div id="panel-menu" class="panel-menu hidden">
+        <div class="panel-menu-title">Show panels</div>
+        <label class="panel-toggle"><input type="checkbox" data-panel="nodes" checked> Nodes</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="operators" checked> Operators needing attention</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="alerts" checked> Firing alerts</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="csrs" checked> Pending certificate requests</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="storage" checked> Storage</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="lightspeed" checked> OpenShift Lightspeed</label>
+        <label class="panel-toggle"><input type="checkbox" data-panel="tailscale" checked> Tailscale</label>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-box"></div>
+
+  <section class="panel" data-panel="banner">
+    <div id="banner">
+      <span id="banner-text"></span>
+      <div class="bar-track"><div class="bar-fill" id="banner-bar"></div></div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="health">
+    <div class="health-hero" id="health-hero">
+      <span class="health-dot" id="health-dot"></span>
+      <div>
+        <div class="health-title" id="health-title">Checking cluster health...</div>
+        <div class="health-sub" id="health-sub"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="cards">
+    <div class="cards" id="cards">
+      <div class="card" id="card-version"><div class="label">OCP Version</div><div class="value">...</div></div>
+      <div class="card" id="card-nodes"><div class="label">Nodes Ready</div><div class="value">...</div></div>
+      <div class="card" id="card-operators"><div class="label">Degraded Operators</div><div class="value">...</div></div>
+      <div class="card" id="card-csr"><div class="label">Pending CSRs</div><div class="value">...</div></div>
+      <div class="card" id="card-alerts"><div class="label">Firing Alerts</div><div class="value">...</div></div>
+      <div class="card" id="card-pvc"><div class="label">PVCs Bound</div><div class="value">...</div></div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="nodes">
+    <h2>Nodes</h2>
+    <table id="nodes-table">
+      <thead>
+        <tr><th>Name</th><th>Role</th><th>Status</th><th>Version</th><th>Age</th><th>Usage</th><th>Actions</th></tr>
+      </thead>
+      <tbody><tr><td colspan="7" class="section-empty">Loading...</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="panel" data-panel="operators">
+    <h2>Operators needing attention</h2>
+    <table id="operators-table">
+      <thead>
+        <tr><th>Operator</th><th>Available</th><th>Progressing</th><th>Degraded</th><th>Message</th></tr>
+      </thead>
+      <tbody><tr><td colspan="5" class="section-empty">Loading...</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="panel" data-panel="alerts">
+    <h2>Firing alerts</h2>
+    <table id="alerts-table">
+      <thead>
+        <tr><th>Alert</th><th>Severity</th><th>Namespace</th><th>Summary</th></tr>
+      </thead>
+      <tbody><tr><td colspan="4" class="section-empty">Loading...</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="panel" data-panel="csrs">
+    <h2>Pending certificate requests <button class="small" id="approve-all-btn">Approve all pending</button></h2>
+    <table id="csr-table">
+      <thead>
+        <tr><th>Name</th><th>Requestor</th><th>Age</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody><tr><td colspan="5" class="section-empty">Loading...</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="panel" data-panel="storage">
+    <h2>Storage</h2>
+    <div class="two-col">
+      <div>
+        <table id="storageclass-table">
+          <thead><tr><th>Storage class</th><th>Provisioner</th><th>Default</th></tr></thead>
+          <tbody><tr><td colspan="3" class="section-empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div>
+        <table id="node-storage-table">
+          <thead><tr><th>Node</th><th>Free space</th></tr></thead>
+          <tbody><tr><td colspan="2" class="section-empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="lightspeed">
+    <h2>OpenShift Lightspeed</h2>
+    <div class="info-box" id="lightspeed-box">
+      <div class="info-title">Loading...</div>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="tailscale">
+    <h2>Tailscale</h2>
+    <div class="info-box" id="tailscale-box">
+      <div class="info-title">Loading...</div>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <span>OpenShift Cluster Overview</span>
+    <span class="footer-sep">·</span>
+    <span>v<span id="footer-version">?</span></span>
+    <span class="footer-sep">·</span>
+    <a href="https://github.com/samjage/cockpit-openshift-overview" target="_blank" rel="noopener">Sam Jage</a>
+  </footer>
+
+  <div id="status-msg"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
