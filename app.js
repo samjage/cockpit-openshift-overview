@@ -26,9 +26,7 @@ let OC_ENV = [];
 let refreshTimer = null;
 let homeDir = null;
 
-/* ---- panel visibility state ----
-   userHidden: persisted in ~/.config/cockpit-openshift-overview/config.json
-   autoHidden: computed each refresh, hides panels whose backend is absent */
+/* ---- panel visibility state ---- */
 let userHidden = new Set();
 let autoHidden = new Set();
 
@@ -63,7 +61,6 @@ function loadConfig() {
         applyPanelVisibility();
         syncMenuCheckboxes();
     }).catch(function () {
-        // No config file yet — fresh install.
         applyPanelVisibility();
         syncMenuCheckboxes();
     });
@@ -123,6 +120,54 @@ function setupPanelMenu() {
 
     document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") menu.classList.add("hidden");
+    });
+}
+
+/* ---- version footer ----
+   Cockpit's bridge consumes manifest.json at startup and does NOT serve it
+   as a static file to the browser, so fetch("manifest.json") 404s. We read
+   it from disk via cockpit.file() instead, trying the standard install
+   locations in order. manifest.json stays the single source of truth. */
+function loadVersion() {
+    var vEl = document.getElementById("footer-version");
+    if (!vEl) return Promise.resolve();
+
+    // Extract the package name from the URL:
+    //   .../cockpit/@localhost/openshift-overview/index.html -> openshift-overview
+    var segments = window.location.pathname.split("/").filter(Boolean);
+    var pkgName = segments[segments.length - 2] || "openshift-overview";
+
+    return cockpit.user().then(function (user) {
+        var candidates = [
+            user.home + "/.local/share/cockpit/" + pkgName + "/manifest.json",
+            "/usr/local/share/cockpit/" + pkgName + "/manifest.json",
+            "/usr/share/cockpit/" + pkgName + "/manifest.json"
+        ];
+        return tryManifestPaths(candidates, vEl);
+    }).catch(function (err) {
+        console.warn("[version] could not determine home directory:", err);
+    });
+}
+
+function tryManifestPaths(paths, vEl) {
+    if (paths.length === 0) {
+        console.warn("[version] manifest.json not found in any standard location");
+        return Promise.resolve();
+    }
+    var path = paths[0];
+    return cockpit.file(path).read().then(function (raw) {
+        if (raw) {
+            try {
+                var m = JSON.parse(raw);
+                if (m.version) vEl.textContent = m.version;
+                return;
+            } catch (e) {
+                console.warn("[version] parse failed for " + path + ":", e);
+            }
+        }
+        return tryManifestPaths(paths.slice(1), vEl);
+    }).catch(function () {
+        return tryManifestPaths(paths.slice(1), vEl);
     });
 }
 
@@ -606,8 +651,6 @@ function loadLightspeed() {
     ]).then(function (results) {
         const cfg = results[0], podList = results[1], topRaw = results[2];
 
-        // If neither the CR nor any pods are present, treat Lightspeed as
-        // absent on this cluster and auto-hide the section.
         if (!cfg && (!podList || !podList.items || podList.items.length === 0)) {
             markPanelUnavailable("lightspeed");
             return;
@@ -679,8 +722,6 @@ function loadTailscale() {
     ]).then(function (results) {
         const statusRaw = results[0], natRaw = results[1], ipRuleRaw = results[2];
 
-        // If the tailscale binary isn't present or the daemon is unreachable,
-        // auto-hide the section.
         if (!statusRaw) {
             markPanelUnavailable("tailscale");
             return;
@@ -800,6 +841,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btn) btn.addEventListener("click", refresh);
 
     setupPanelMenu();
+    loadVersion();
 
     findKubeconfig().then(function (env) {
         OC_ENV = env;
