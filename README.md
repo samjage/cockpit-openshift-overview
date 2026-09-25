@@ -5,7 +5,8 @@ at-a-glance view of an OpenShift cluster — node readiness and resource usage,
 operator health, firing alerts, pending CSRs with one-click approve, storage
 classes, OpenShift Lightspeed model info, and Tailscale subnet-router checks.
 
-![screenshot](screenshot.png)
+![screenshot](Screenshot1.png)
+![screenshot](Screenshot2.png)
 
 ## Features
 
