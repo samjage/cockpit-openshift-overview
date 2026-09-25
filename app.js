@@ -231,7 +231,7 @@ function runCmd(args) {
 }
 
 function runRoot(args) {
-    return cockpit.spawn(args, { err: "message", environ: OC_ENV }).then(function (o) { return o.trim(); });
+    return cockpit.spawn(args, { err: "message", environ: OC_ENV, superuser: "try" }).then(function (o) { return o.trim(); });
 }
 
 function confirmAction(msg) {

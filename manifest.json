@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "Sam Jage <sam@samjage.com> (https://github.com/samjage)",
   "requires": { "cockpit": "286" },
   "tools": {

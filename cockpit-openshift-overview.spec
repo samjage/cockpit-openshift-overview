@@ -1,5 +1,5 @@
 Name:           cockpit-openshift-overview
-Version:        0.1.0
+Version:        0.1.3
 Release:        1%{?dist}
 Summary:        Cockpit plugin for OpenShift cluster overview
 
@@ -31,5 +31,9 @@ cp manifest.json index.html app.js style.css \
 %{_datadir}/cockpit/%{name}/
 
 %changelog
-* Wed Sep 25 2026 Sam Jage <sam@samjage.com> - 0.1.0-1
+* Fri Sep 25 2026 Sam Jage <sam@samjage.com> - 0.1.3-1
+- Fix runRoot() missing superuser escalation — Tailscale masquerade-rule
+  check was silently always reporting "Unknown (no root)"
+
+* Wed Sep 25 2026 Sam Jage <sam@samjage.com> - 0.1.0-1.2
 - Initial release
